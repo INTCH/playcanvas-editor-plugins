@@ -8,16 +8,6 @@
 // @grant        none
 // ==/UserScript==
 
-// ==UserScript==
-// @name         PlayCanvas Better Rename
-// @namespace    https://github.com/INTCH/playcanvas-better-rename
-// @version      1.0
-// @description  PlayCanvas Better Rename
-// @author       INTCH
-// @match        *://playcanvas.com/editor/*
-// @grant        none
-// ==/UserScript==
-
 (function () {
   "use strict";
 
