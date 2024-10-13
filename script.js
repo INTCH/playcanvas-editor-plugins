@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PlayCanvas Better Rename
 // @namespace    https://github.com/INTCH/playcanvas-better-rename
-// @version      1.0
+// @version      1.1
 // @description  PlayCanvas Better Rename
 // @author       INTCH
 // @match        *://playcanvas.com/editor/*
@@ -16,7 +16,7 @@
 
     if (menuItemsDivs.length > 0) {
       menuItemsDivs.forEach((menuItemsDiv, index) => {
-        if (!(index == 29 || index == 1)) return;
+        if (!(index == 29 || index == 1)) return; // Adjust the indices according to your needs
         const newDiv = document.createElement("div");
         newDiv.className =
           "pcui-element font-regular pcui-container pcui-menu-item";
@@ -34,11 +34,11 @@
           );
           if (searchPattern === null) return;
 
-          let newName = prompt("Change (e.g. Entity or Entity{i+1}):");
+          let newName = prompt("Change (e.g. {name}{i+1}):");
           if (newName === null) return;
 
           const regex = searchPattern ? new RegExp(searchPattern, "g") : null;
-          let counter = 0;
+          let counter = 1;
 
           function processMathExpression(expression, index) {
             try {
@@ -51,28 +51,26 @@
 
           editor.selection.items.forEach((v) => {
             let currentName = v.get("name");
-            let modifiedName = newName;
-
-            if (modifiedName.includes("{name}")) {
-              modifiedName = modifiedName.replace(/{name}/g, currentName);
-            }
+            let modifiedName = currentName;
 
             if (regex) {
               modifiedName = modifiedName.replace(regex, (match) => {
-                return modifiedName.replace(
-                  /\{([^\}]+)\}/g,
-                  (_, expression) => {
-                    return processMathExpression(expression, counter);
-                  }
-                );
+                let newReplacement = newName;
+
+                if (newReplacement.includes("{name}")) {
+                  newReplacement = newReplacement.replace(/{name}/g, currentName);
+                }
+
+                newReplacement = newReplacement.replace(/\{([^\}]+)\}/g, (_, expression) => {
+                  return processMathExpression(expression, counter);
+                });
+
+                return newReplacement;
               });
             } else {
-              modifiedName = modifiedName.replace(
-                /\{([^\}]+)\}/g,
-                (_, expression) => {
-                  return processMathExpression(expression, counter);
-                }
-              );
+              modifiedName = newName.replace(/{name}/g, currentName).replace(/\{([^\}]+)\}/g, (_, expression) => {
+                return processMathExpression(expression, counter);
+              });
             }
 
             counter++;
