@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         PlayCanvas Better Rename
-// @namespace    https://github.com/INTCH/playcanvas-better-rename
+// @namespace    http://tampermonkey.net/
 // @version      1.1
 // @description  PlayCanvas Better Rename
-// @author       INTCH
+// @author       You
 // @match        *://playcanvas.com/editor/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=playcanvas.com
 // @grant        none
 // ==/UserScript==
 
