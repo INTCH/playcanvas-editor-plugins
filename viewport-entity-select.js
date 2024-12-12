@@ -2,7 +2,7 @@
 // @name         PlayCanvas Viewport Entity Select
 // @namespace    http://tampermonkey.net/
 // @version      1.0
-// @description  Select entity attribute in the viewport
+// @description  Select entity attribute from viewport
 // @author       You
 // @match        *://playcanvas.com/editor/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=playcanvas.com
