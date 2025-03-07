@@ -4,3 +4,4 @@ playcanvas editor plugins I made according to my needs. use with [tampermonkey](
  2. Copy Asset IDs
  3. Select entity attribute from viewport
  4. Editor Camera Speed Up
+ 5. Copy Viewport Entity Path
