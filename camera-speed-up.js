@@ -94,7 +94,7 @@
                 </span>
 
                 <input type="range" id="cam-input"
-                       min="1" max="1000" step="1" value="${window.flyCamSpeedMultiplier}"
+                       min="1" max="100" step="1" value="${window.flyCamSpeedMultiplier}"
                        style="flex-grow: 1; cursor: pointer; height: 4px;">
             </div>
         `;
