@@ -9,8 +9,109 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-const flySpeed = 70;
-const flySpeedFast = 250;
-let flying=!1;const flyEasing=.5,flyVec=new pc.Vec3,direction=new pc.Vec3;let flyCamera=null,firstUpdate=!1,shiftKey=!1;const vecA=new pc.Vec3,keys={forward:!1,left:!1,back:!1,right:!1,up:!1,down:!1},keyMappings=new Map([["arrowup","forward"],["w","forward"],["arrowleft","left"],["a","left"],["arrowdown","back"],["s","back"],["arrowright","right"],["d","right"],["e","up"],["pageup","up"],["q","down"],["pagedown","down"]]),isInputOrTextarea=e=>/input|textarea/i.test(e.tagName),setKeyState=(e,t)=>{let a=keyMappings.get(e.toLowerCase());a&&(keys[a]=t)},updateDirection=()=>{let e=Number(keys.right)-Number(keys.left),t=Number(keys.up)-Number(keys.down),a=Number(keys.back)-Number(keys.forward);direction.set(e,t,a).normalize()},endFly=()=>{flying&&(Object.keys(keys).forEach(e=>{keys[e]=!1}),flying=!1,editor.call("camera:history:stop",flyCamera),editor.call("viewport:render"))};window.addEventListener("keydown",e=>{!isInputOrTextarea(e.target)&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&keyMappings.has(e.key.toLowerCase())&&(setKeyState(e.key,!0),updateDirection(),flying||(flyCamera=editor.call("camera:current"),editor.call("camera:history:start",flyCamera)),flying=!0,firstUpdate=!0,editor.call("camera:focus:stop"),editor.call("viewport:render"))},!1),window.addEventListener("keyup",e=>{!flying||isInputOrTextarea(e.target)||e.ctrlKey||e.metaKey||e.altKey||(setKeyState(e.key,!1),updateDirection(),Object.values(keys).every(e=>!e)&&endFly())},!1),window.addEventListener("blur",endFly),document.addEventListener("visibilitychange",endFly),editor.on("viewport:update",e=>{let t,a=0;flying&&(a=shiftKey?250:70,a*=firstUpdate?1/60:e,t=editor.call("camera:current"),vecA.copy(direction).scale(a),t.camera.projection===pc.PROJECTION_ORTHOGRAPHIC&&(vecA.y=-vecA.z,vecA.z=0),vecA.length()?(t.getRotation().transformVector(vecA,vecA),flyVec.lerp(flyVec,vecA,Math.min(1,.5*((firstUpdate?1/60:e)/(1/60))))):a=0,editor.call("viewport:render")),flyVec.length()>.01&&(0===a&&flyVec.lerp(flyVec,vecA.set(0,0,0),Math.min(1,.5*((firstUpdate?1/60:e)/(1/60)))),flyVec.length()&&(t=t||editor.call("camera:current")).setPosition(t.getPosition().add(flyVec)),firstUpdate=!1,editor.call("viewport:render"))}),editor.on("hotkey:shift",e=>{shiftKey=e});
+(function () {
+    "use strict";
+
+    window.flyCamSpeedMultiplier = 1.0;
+
+    if (window._flyCamBoosterFunc) {
+        editor.off('viewport:update', window._flyCamBoosterFunc);
+    }
+
+    window._flyCamBoosterFunc = (dt) => {
+        if (window.flyCamSpeedMultiplier <= 1.0) return;
+
+        const pressedKeys = window._flyCamKeys || new Set();
+        if (pressedKeys.size === 0) return;
+
+        const camera = editor.call('camera:current');
+        if (!camera) return;
+
+        let extraSpeed = 7 * (window.flyCamSpeedMultiplier - 1) * dt;
+        if (pressedKeys.has('shift')) extraSpeed *= 2.5;
+
+        const flyVec = new pc.Vec3();
+        if (pressedKeys.has('w')) flyVec.z -= extraSpeed;
+        if (pressedKeys.has('s')) flyVec.z += extraSpeed;
+        if (pressedKeys.has('a')) flyVec.x -= extraSpeed;
+        if (pressedKeys.has('d')) flyVec.x += extraSpeed;
+        if (pressedKeys.has('e')) flyVec.y += extraSpeed;
+        if (pressedKeys.has('q')) flyVec.y -= extraSpeed;
+
+        if (flyVec.lengthSq() > 0) {
+            camera.translateLocal(flyVec);
+            editor.call('viewport:render');
+        }
+    };
+
+    window._flyCamKeys = new Set();
+    const onKeyDown = (e) => { if (!/input|textarea/i.test(e.target.tagName)) window._flyCamKeys.add(e.key.toLowerCase()); };
+    const onKeyUp = (e) => { window._flyCamKeys.delete(e.key.toLowerCase()); };
+
+    window.removeEventListener('keydown', window._flyCamBoosterKeyDown);
+    window.removeEventListener('keyup', window._flyCamBoosterKeyUp);
+    window._flyCamBoosterKeyDown = onKeyDown;
+    window._flyCamBoosterKeyUp = onKeyUp;
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+
+    editor.on('viewport:update', window._flyCamBoosterFunc);
+
+
+
+
+    setTimeout(() => {
+
+        const panels = document.querySelectorAll(".settings-panel");
+        const level1 = panels[1];
+        if (!level1) return;
+        const level2 = level1.children[1];
+        if (!level2) return;
+        const finalTarget = level2.children[0];
+        if (!finalTarget) return;
+
+
+        const oldSlider = document.getElementById("custom-cam-wrapper");
+        if (oldSlider) oldSlider.remove();
+
+
+        const wrapperDiv = document.createElement("div");
+        wrapperDiv.id = "custom-cam-wrapper";
+
+
+        wrapperDiv.style.cssText = `
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 12px;
+            color: #b1b8ba;
+            margin: 3px 10px;
+        `;
+
+
+        wrapperDiv.innerHTML = `
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span id="cam-label" style="min-width: 120px; white-space: nowrap;">
+                    Camera Speed (x${window.flyCamSpeedMultiplier})
+                </span>
+
+                <input type="range" id="cam-input"
+                       min="1" max="1000" step="1" value="${window.flyCamSpeedMultiplier}"
+                       style="flex-grow: 1; cursor: pointer; height: 4px;">
+            </div>
+        `;
+
+
+        finalTarget.appendChild(wrapperDiv);
+
+        const input = wrapperDiv.querySelector("#cam-input");
+        const label = wrapperDiv.querySelector("#cam-label");
+
+        input.addEventListener("input", (e) => {
+            const val = parseFloat(e.target.value);
+            window.flyCamSpeedMultiplier = val;
+
+
+            label.textContent = `Camera Speed (x${val})`;
+        });
+
+    }, 5000);
 })();
