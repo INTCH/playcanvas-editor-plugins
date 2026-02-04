@@ -17,7 +17,7 @@
 
     if (menuItemsDivs.length > 0) {
       menuItemsDivs.forEach((menuItemsDiv, index) => {
-        if (!(index == 29 || index == 1)) return;
+        if (!(index == 31 || index == 1)) return;
         const newDiv = document.createElement("div");
         newDiv.className =
           "pcui-element font-regular pcui-container pcui-menu-item";
