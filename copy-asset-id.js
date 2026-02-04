@@ -22,7 +22,7 @@
             "pcui-element font-regular pcui-container pcui-menu-item";
           newDiv.innerHTML = `
             <div class="pcui-element font-regular pcui-menu-item-content pcui-container pcui-flex" style="flex-direction: row;">
-              <span class="pcui-element font-regular pcui-label">Copy ID</span>
+              <span class="pcui-element font-regular pcui-label" data-icon="🆔">Copy ID</span>
             </div>
             <div class="pcui-element font-regular pcui-menu-item-children pcui-container"></div>
           `;
