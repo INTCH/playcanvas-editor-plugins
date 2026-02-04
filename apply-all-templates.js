@@ -16,7 +16,7 @@
     const menuItemsDivs = document.querySelectorAll(".pcui-menu-items");
     if (menuItemsDivs.length > 0) {
       menuItemsDivs.forEach((menuItemsDiv, index) => {
-        if (index === 29) {
+        if (index === 31) {
           const newDiv = document.createElement("div");
           newDiv.className =
             "pcui-element font-regular pcui-container pcui-menu-item";
