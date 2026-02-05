@@ -28,7 +28,7 @@
              function getEntityPath(entity) {
                  const names = [];
                  let current = entity;
-                 while (current && current.get('name') !== 'Root') {
+                 while (current) {
                      names.push(current.get('name'));
                      current = editor.call('entities:get', current.get('parent'));
                  }
