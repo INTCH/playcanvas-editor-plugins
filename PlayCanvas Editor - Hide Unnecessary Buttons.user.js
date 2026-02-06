@@ -17,7 +17,7 @@
         '.pc-icon.discord',     // Discord
         '.pc-icon.forum',       // Forum
         '.pc-icon.help-howdoi',  // "How do I...?"
-        '.pc-icom.help-controls' // Controls
+        '.pc-icon.help-controls' // Controls
     ];
 
     classesToHide.forEach(selector => {
